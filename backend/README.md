@@ -193,6 +193,7 @@ Copy `.env.example` to `.env` and adjust as needed:
 | `FRONTEND_ORIGIN` | Allowed CORS origin | `http://localhost:5173` |
 | `REQUEST_TIMEOUT_MS` | Timeout for outbound JAKIM/Aladhan requests | `8000` |
 | `ADMIN_SYNC_TOKEN` | Shared secret required in `X-Admin-Token` to call the manual sync route | none — route returns `503` until set |
+| `DATABASE_PATH` | Absolute path for the masjid SQLite file — point this at a persistent volume in production, since app code is redeployed fresh on every deploy | `src/db/masjid.sqlite3` |
 
 ## Running
 

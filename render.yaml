@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: sewaktu-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: REQUEST_TIMEOUT_MS
+        value: 8000
+      - key: ADMIN_SYNC_TOKEN
+        sync: false

@@ -23,6 +23,7 @@ SeWaktu ("se-waktu", roughly "in time") pulls prayer times from JAKIM's official
 - [Project structure](#project-structure)
 - [Getting started](#getting-started)
 - [Configuration](#configuration)
+- [Deployment](#deployment)
 - [API overview](#api-overview)
 - [Data sources & attribution](#data-sources--attribution)
 
@@ -117,12 +118,62 @@ one immediately instead of waiting for the daily 3am job.
 | `FRONTEND_ORIGIN` | Allowed CORS origin | `http://localhost:5173` |
 | `REQUEST_TIMEOUT_MS` | Timeout for outbound JAKIM/Aladhan requests | `8000` |
 | `ADMIN_SYNC_TOKEN` | Shared secret for the manual masjid-sync endpoint | — |
+| `DATABASE_PATH` | Optional: absolute path for the masjid SQLite file | `backend/src/db/masjid.sqlite3` |
 
 **`frontend/.env`**
 
 | Variable | Description | Default |
 | --- | --- | --- |
 | `VITE_API_URL` | Base URL of the backend API | `http://localhost:3000` |
+
+## Deployment
+
+The frontend is a static SPA build (deploys anywhere that serves static files). The backend is
+a stateful Express process with a local SQLite file and an in-process `node-cron` scheduler —
+that combination doesn't run on serverless/edge platforms like Vercel, so the two halves need
+different kinds of hosts.
+
+### Frontend → Vercel
+
+1. Import this repo in Vercel and set **Root Directory** to `frontend`. Framework, build
+   command (`vite build`), and output directory (`dist`) are all auto-detected.
+2. Add the env var `VITE_API_URL` in the Vercel project's settings, pointing at your deployed
+   backend's public URL.
+3. `frontend/vercel.json` is already included with a rewrite rule so client-side routes like
+   `/masjid` and `/timetable` don't 404 on refresh or direct navigation.
+
+### Backend → Render
+
+A `render.yaml` Blueprint is included at the repo root. In Render, choose
+**New → Blueprint**, point it at this repo, and it configures a free Node web service rooted at
+`backend/` with `npm install` / `npm start`. You'll be prompted in the dashboard for the two
+secrets marked `sync: false`:
+
+| Variable | Set to |
+| --- | --- |
+| `FRONTEND_ORIGIN` | Your deployed Vercel URL |
+| `ADMIN_SYNC_TOKEN` | A real secret — don't ship the `change-me` placeholder |
+
+**Free-tier caveat:** Render's free web services don't support attached persistent disks, so
+the masjid SQLite file resets on every deploy/restart — it self-repopulates via the daily 3am
+sync, or you can trigger `POST /api/admin/sync-masjid-data` once right after a deploy. Prayer
+times and timetables are unaffected (they're not stored locally at all).
+
+If you upgrade to a paid instance type, add a persistent disk and point `DATABASE_PATH` at it
+so the masjid data survives deploys:
+
+```yaml
+disk:
+  name: sewaktu-data
+  mountPath: /var/data
+  sizeGB: 1
+envVars:
+  - key: DATABASE_PATH
+    value: /var/data/masjid.sqlite3
+```
+
+Any other host that runs a persistent Node process (Railway, Fly.io, a VPS) works too — same
+`npm install && npm start`, same env vars.
 
 ## API overview
 

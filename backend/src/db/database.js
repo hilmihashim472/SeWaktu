@@ -1,9 +1,14 @@
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Database from "better-sqlite3";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, "masjid.sqlite3");
+// DATABASE_PATH lets a persistent volume live outside the source tree (e.g. a
+// Render disk), since the app code itself is redeployed fresh on every deploy.
+const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, "masjid.sqlite3");
+
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
