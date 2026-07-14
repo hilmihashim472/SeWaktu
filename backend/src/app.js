@@ -9,9 +9,13 @@ import timetableRouter from "./routes/timetable.js";
 
 const app = express();
 
+// Strip a trailing slash so a stray "/" in FRONTEND_ORIGIN (e.g. https://app.vercel.app/)
+// doesn't silently break CORS — browsers match Origin exactly, with no normalization.
+const frontendOrigin = (process.env.FRONTEND_ORIGIN || "http://localhost:5173").replace(/\/+$/, "");
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+    origin: frontendOrigin,
   })
 );
 app.use(morgan("dev"));
