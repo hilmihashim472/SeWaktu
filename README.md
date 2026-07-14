@@ -1,4 +1,4 @@
-# SeWaktu
+# SeWaktu - Waktu Solat Malaysia
 
 **Malaysian Islamic prayer times, a masjid/surau directory, and monthly prayer timetables —
 in one app.**
