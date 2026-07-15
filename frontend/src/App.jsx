@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import BottomNav from "./components/BottomNav";
 import Footer from "./components/Footer";
@@ -44,6 +44,15 @@ export default function App() {
   const clock = useClock();
   const notifications = useNotificationPreference();
   const { t } = useLanguage();
+  const { pathname } = useLocation();
+
+  // Jump back to the top whenever the user navigates to a different page
+  // (nav bar / bottom nav tab). Keyed on pathname only, so in-page updates
+  // like Timetable's month/date filters or Masjid's pagination — which only
+  // change the query string — don't reset scroll position.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, zone);

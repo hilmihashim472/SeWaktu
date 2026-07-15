@@ -154,6 +154,11 @@ export default {
       "Your device doesn't support a live compass. Face true north yourself, then rotate to the bearing below.",
     bearing: "Qibla Bearing",
     distance: "Distance",
+    calibrateTitle: "Calibrate Compass",
+    calibrateBody:
+      "For a more accurate reading, move your phone in a figure-8 (∞) motion a few times, away from metal objects or magnets.",
+    calibrateGotIt: "Got it",
+    recalibrate: "Recalibrate compass",
   },
   settings: {
     title: "Settings",

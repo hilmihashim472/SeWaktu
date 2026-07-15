@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   calculateDistanceToKaaba,
   calculateQiblaBearing,
@@ -111,6 +111,52 @@ function CompassDial({ qiblaBearing, heading, live, aligned }) {
   );
 }
 
+const FIGURE_EIGHT_PATH =
+  "M100,60 C100,20 40,20 40,60 C40,100 100,100 100,60 C100,20 160,20 160,60 C160,100 100,100 100,60 Z";
+
+function CalibrationModal({ onClose }) {
+  const { t } = useLanguage();
+  return (
+    <div
+      className="fixed inset-0 z-30 flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("qiblat.calibrateTitle")}
+        onClick={(event) => event.stopPropagation()}
+        className="w-full max-w-sm rounded-xl border border-line bg-surface-mid p-6 text-center shadow-2xl animate-fade-in-up"
+      >
+        <svg viewBox="0 0 200 120" className="mx-auto h-24 w-40" aria-hidden="true">
+          <path
+            d={FIGURE_EIGHT_PATH}
+            fill="none"
+            stroke="var(--line-strong)"
+            strokeWidth="3"
+            strokeDasharray="7 7"
+            strokeLinecap="round"
+          />
+          <circle r="8" fill="var(--accent)">
+            <animateMotion dur="2.5s" repeatCount="indefinite" path={FIGURE_EIGHT_PATH} />
+          </circle>
+        </svg>
+
+        <h2 className="mt-2 font-serif text-lg text-ink-100">{t("qiblat.calibrateTitle")}</h2>
+        <p className="mt-2 text-sm text-ink-400">{t("qiblat.calibrateBody")}</p>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-5 w-full rounded-lg border border-brass/60 bg-brass/10 px-4 py-2 text-sm font-medium text-accent-strong transition-colors hover:bg-brass/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+        >
+          {t("qiblat.calibrateGotIt")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Qiblat() {
   const { t } = useLanguage();
   const [coords, setCoords] = useState(null);
@@ -120,6 +166,8 @@ export default function Qiblat() {
   const [heading, setHeading] = useState(0);
   const [orientationAvailable, setOrientationAvailable] = useState(null);
   const [orientationPermission, setOrientationPermission] = useState("unknown");
+  const [showCalibration, setShowCalibration] = useState(false);
+  const calibrationAutoShownRef = useRef(false);
 
   function locate() {
     setGeoStatus("loading");
@@ -191,6 +239,16 @@ export default function Qiblat() {
   const relativeBearing = live ? ((qiblaBearing - heading + 360) % 360) : null;
   const aligned = relativeBearing !== null && (relativeBearing <= 5 || relativeBearing >= 355);
 
+  // Prompt for calibration once, the first time the live compass becomes
+  // available on this page visit — accuracy depends on the user actually
+  // moving the phone through a figure-8 to settle the magnetometer.
+  useEffect(() => {
+    if (live && !calibrationAutoShownRef.current) {
+      calibrationAutoShownRef.current = true;
+      setShowCalibration(true);
+    }
+  }, [live]);
+
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
       <div className="flex flex-col items-center gap-1 text-center">
@@ -244,8 +302,20 @@ export default function Qiblat() {
               </p>
             </div>
           </div>
+
+          {live && (
+            <button
+              type="button"
+              onClick={() => setShowCalibration(true)}
+              className="text-sm text-accent-strong underline decoration-brass/40 underline-offset-2 transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+            >
+              {t("qiblat.recalibrate")}
+            </button>
+          )}
         </div>
       )}
+
+      {showCalibration && <CalibrationModal onClose={() => setShowCalibration(false)} />}
     </div>
   );
 }

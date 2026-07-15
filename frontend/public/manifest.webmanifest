@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "SeWaktu - Waktu Solat Malaysia",
+  "short_name": "SeWaktu",
+  "description": "Malaysian prayer times, monthly timetable, Qiblat compass, and masjid directory.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "ms",
+  "background_color": "#0B1F2A",
+  "theme_color": "#0B1F2A",
+  "icons": [
+    {
+      "src": "/iconSW.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

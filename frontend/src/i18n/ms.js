@@ -155,6 +155,11 @@ export default {
       "Peranti anda tidak menyokong kompas langsung. Hadap ke utara sebenar sendiri, kemudian pusing mengikut bearing di bawah.",
     bearing: "Bearing Kiblat",
     distance: "Jarak",
+    calibrateTitle: "Kalibrasi Kompas",
+    calibrateBody:
+      "Untuk arah yang lebih tepat, gerakkan telefon anda mengikut corak angka lapan (∞) beberapa kali, jauh daripada objek logam atau magnet.",
+    calibrateGotIt: "Faham",
+    recalibrate: "Kalibrasi semula kompas",
   },
   settings: {
     title: "Tetapan",
