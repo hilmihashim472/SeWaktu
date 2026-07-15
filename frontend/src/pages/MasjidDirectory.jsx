@@ -5,11 +5,12 @@ import MasjidList from "../components/masjid/MasjidList";
 import Pagination from "../components/masjid/Pagination";
 import MasjidDetailModal from "../components/masjid/MasjidDetailModal";
 import useMasjidSearch from "../hooks/useMasjidSearch";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const LIMIT = 50;
-const KIND_LABELS = { masjid: "masjid", surau: "surau", "": "masjid & surau" };
 
 export default function MasjidDirectory() {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -66,25 +67,26 @@ export default function MasjidDirectory() {
     [navigate, searchParams]
   );
 
+  const kindLabelKey = filters.kind === "masjid" ? "kindMasjid" : filters.kind === "surau" ? "kindSurau" : "kindAll";
   const summary =
     !loading && !error
-      ? `${total.toLocaleString()} ${KIND_LABELS[filters.kind]}${filters.state ? ` in ${filters.state}` : ""}`
+      ? `${total.toLocaleString()} ${t(`masjidDirectory.${kindLabelKey}`)}${
+          filters.state ? t("masjidDirectory.summaryInState", { state: filters.state }) : ""
+        }`
       : null;
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
       <div className="text-center">
-        <h1 className="font-serif text-3xl text-slate-100 sm:text-4xl">
-          Masjid <span className="text-brass">&amp; Surau Directory</span>
+        <h1 className="font-serif text-3xl text-ink-100 sm:text-4xl">
+          {t("masjidDirectory.titlePrefix")} <span className="text-accent">{t("masjidDirectory.titleAccent")}</span>
         </h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Search masjid and surau across Malaysia, sourced from JAKIM and JAIS.
-        </p>
+        <p className="mt-2 text-sm text-ink-400">{t("masjidDirectory.subtitle")}</p>
       </div>
 
       <MasjidFilters filters={filters} onChange={updateFilters} />
 
-      {summary && <p className="font-mono text-sm text-slate-400">{summary}</p>}
+      {summary && <p className="font-mono text-sm text-ink-400">{summary}</p>}
 
       <MasjidList
         results={results}
@@ -105,17 +107,17 @@ export default function MasjidDirectory() {
         />
       )}
 
-      <p className="mt-4 text-center text-xs text-slate-500">
-        Masjid &amp; surau data from SISMIM (JAKIM) and JAIS e-Masjid, compiled via the{" "}
+      <p className="mt-4 text-center text-xs text-ink-500">
+        {t("masjidDirectory.attribution")}{" "}
         <a
           href="https://github.com/abualif120/malaysia-masjid-dataset"
           target="_blank"
           rel="noreferrer"
-          className="text-brass-light underline decoration-brass/40 underline-offset-2 hover:text-brass"
+          className="text-accent-strong underline decoration-brass/40 underline-offset-2 hover:text-accent"
         >
-          Malaysia Masjid Dataset
+          {t("masjidDirectory.attributionLinkLabel")}
         </a>{" "}
-        (CC BY 4.0).
+        {t("masjidDirectory.attributionSuffix")}
       </p>
 
       {id && <MasjidDetailModal id={id} onClose={closeModal} />}

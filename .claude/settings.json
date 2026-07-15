@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node \"C:\\\\Users\\\\ALEXDR~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--xampp-htdocs-Project-SeWaktu\\\\34202cb9-990e-4868-974e-af1d97fcbb84\\\\scratchpad\\\\check-i18n-keys.mjs\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

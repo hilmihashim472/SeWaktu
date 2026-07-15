@@ -1,6 +1,6 @@
 const KIND_STYLES = {
-  masjid: "bg-brass/15 text-brass-light border-brass/30",
-  surau: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  masjid: "bg-brass/15 text-accent-strong border-brass/30",
+  surau: "bg-emerald-500/15 text-positive border-emerald-500/30",
 };
 
 export default function MasjidCard({ masjid, onSelect }) {
@@ -19,10 +19,10 @@ export default function MasjidCard({ masjid, onSelect }) {
       tabIndex={0}
       onClick={() => onSelect(masjid.id)}
       onKeyDown={handleKeyDown}
-      className="group flex cursor-pointer flex-col gap-2 rounded-xl border border-white/10 bg-white/5 p-4 text-left backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brass/40 hover:bg-white/[0.08] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+      className="group flex cursor-pointer flex-col gap-2 rounded-xl border border-line bg-tint p-4 text-left backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brass/40 hover:bg-tint-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-serif text-base leading-snug text-slate-100 group-hover:text-brass-light">
+        <h3 className="font-serif text-base leading-snug text-ink-100 group-hover:text-accent-strong">
           {masjid.name}
         </h3>
         <span
@@ -32,12 +32,12 @@ export default function MasjidCard({ masjid, onSelect }) {
         </span>
       </div>
 
-      {location && <p className="text-sm text-slate-400">{location}</p>}
+      {location && <p className="text-sm text-ink-400">{location}</p>}
 
       {(masjid.category || masjid.phone) && (
         <div className="mt-1 flex flex-wrap items-center gap-2">
           {masjid.category && (
-            <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-slate-300">
+            <span className="rounded-full border border-line bg-tint px-2 py-0.5 text-[10px] text-ink-300">
               {masjid.category}
             </span>
           )}
@@ -45,7 +45,7 @@ export default function MasjidCard({ masjid, onSelect }) {
             <a
               href={`tel:${masjid.phone}`}
               onClick={(event) => event.stopPropagation()}
-              className="ml-auto flex items-center gap-1 font-mono text-xs text-slate-400 transition-colors hover:text-brass focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
+              className="ml-auto flex items-center gap-1 font-mono text-xs text-ink-400 transition-colors hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass"
             >
               <svg
                 viewBox="0 0 24 24"

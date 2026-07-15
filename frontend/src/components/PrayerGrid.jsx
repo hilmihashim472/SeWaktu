@@ -1,4 +1,5 @@
 import PrayerIcon from "./PrayerIcon";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export const PRAYER_LABELS = {
   imsak: "Imsak",
@@ -11,6 +12,7 @@ export const PRAYER_LABELS = {
 };
 
 export default function PrayerGrid({ timings, next, current }) {
+  const { t } = useLanguage();
   const entries = Object.entries(PRAYER_LABELS);
 
   return (
@@ -27,7 +29,7 @@ export default function PrayerGrid({ timings, next, current }) {
             } ${
               isNext
                 ? "border-brass bg-brass/10 shadow-[0_0_24px_-6px_rgba(196,147,63,0.7)] scale-[1.03]"
-                : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.08]"
+                : "border-line bg-tint hover:border-line-strong hover:bg-tint-strong"
             }`}
           >
             {isCurrent && !isNext && (
@@ -35,25 +37,25 @@ export default function PrayerGrid({ timings, next, current }) {
             )}
             <PrayerIcon
               name={key}
-              className={`mx-auto h-6 w-6 ${isNext ? "text-brass" : "text-slate-400"}`}
+              className={`mx-auto h-6 w-6 ${isNext ? "text-accent" : "text-ink-400"}`}
             />
             <p
               className={`mt-2 font-serif text-sm sm:text-base ${
-                isNext ? "text-brass-light" : "text-slate-300"
+                isNext ? "text-accent-strong" : "text-ink-300"
               }`}
             >
               {label}
             </p>
             <p
               className={`mt-1 font-mono text-lg sm:text-xl tabular-nums ${
-                isNext ? "text-brass" : "text-slate-100"
+                isNext ? "text-accent" : "text-ink-100"
               }`}
             >
               {timings[key]}
             </p>
             {isCurrent && !isNext && (
-              <p className="mt-1 text-[10px] uppercase tracking-wider text-emerald-400/80">
-                Now
+              <p className="mt-1 text-[10px] uppercase tracking-wider text-positive">
+                {t("prayerGrid.now")}
               </p>
             )}
           </div>
