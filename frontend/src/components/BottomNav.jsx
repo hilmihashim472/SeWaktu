@@ -64,30 +64,6 @@ const TABS = [
     ),
   },
   {
-    to: "/mosques",
-    end: false,
-    labelKey: "nav.masjid",
-    icon: (
-      <>
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M4 21V11.5c0-1.5.7-2.9 1.9-3.8L12 3l6.1 4.7c1.2.9 1.9 2.3 1.9 3.8V21"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 21v-6a3 3 0 0 1 6 0v6"
-        />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M4 21h16M12 3v2.5"
-        />
-      </>
-    ),
-  },
-  {
     to: "/settings",
     end: false,
     labelKey: "nav.settings",

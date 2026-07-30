@@ -101,33 +101,6 @@ export default function Navbar({ clock, currentPrayer }) {
             </svg>
             <span className="hidden sm:inline">{t("nav.qiblat")}</span>
           </NavLink>
-          <NavLink to="/mosques" className={navLinkClass}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              className="h-4 w-4"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 21V11.5c0-1.5.7-2.9 1.9-3.8L12 3l6.1 4.7c1.2.9 1.9 2.3 1.9 3.8V21"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 21v-6a3 3 0 0 1 6 0v6"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 21h16M12 3v2.5"
-              />
-            </svg>
-            <span className="hidden sm:inline">{t("nav.masjid")}</span>
-          </NavLink>
           <NavLink to="/settings" className={navLinkClass}>
             <svg
               viewBox="0 0 24 24"
