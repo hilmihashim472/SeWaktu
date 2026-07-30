@@ -4,7 +4,8 @@ import Navbar from "./components/Navbar";
 import BottomNav from "./components/BottomNav";
 import Footer from "./components/Footer";
 import PrayerTimesPage from "./pages/PrayerTimesPage";
-import MasjidDirectory from "./pages/MasjidDirectory";
+import Mosques from "./pages/Mosques";
+import MosqueDetail from "./pages/MosqueDetail";
 import Timetable from "./pages/Timetable";
 import Qiblat from "./pages/Qiblat";
 import Settings from "./pages/Settings";
@@ -116,8 +117,8 @@ export default function App() {
             />
           }
         />
-        <Route path="/masjid" element={<MasjidDirectory />} />
-        <Route path="/masjid/:id" element={<MasjidDirectory />} />
+        <Route path="/mosques" element={<Mosques />} />
+        <Route path="/mosques/:id" element={<MosqueDetail />} />
         <Route
           path="/timetable"
           element={

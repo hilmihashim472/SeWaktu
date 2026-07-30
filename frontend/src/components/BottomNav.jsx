@@ -63,8 +63,8 @@ const TABS = [
       </>
     ),
   },
-  /*{
-    to: "/masjid",
+  {
+    to: "/mosques",
     end: false,
     labelKey: "nav.masjid",
     icon: (
@@ -86,7 +86,7 @@ const TABS = [
         />
       </>
     ),
-  },*/
+  },
   {
     to: "/settings",
     end: false,

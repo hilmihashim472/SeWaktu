@@ -101,7 +101,7 @@ export default function Navbar({ clock, currentPrayer }) {
             </svg>
             <span className="hidden sm:inline">{t("nav.qiblat")}</span>
           </NavLink>
-          {/* <NavLink to="/masjid" className={navLinkClass}>
+          <NavLink to="/mosques" className={navLinkClass}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -127,7 +127,7 @@ export default function Navbar({ clock, currentPrayer }) {
               />
             </svg>
             <span className="hidden sm:inline">{t("nav.masjid")}</span>
-          </NavLink> */}
+          </NavLink>
           <NavLink to="/settings" className={navLinkClass}>
             <svg
               viewBox="0 0 24 24"

@@ -211,3 +211,168 @@ The server starts on `http://localhost:<PORT>` (default `3000`). The masjid data
 until the first successful sync — either wait for the 3am cron run or trigger one manually (see
 above). The SQLite file lives at `src/db/masjid.sqlite3` and is gitignored; it's rebuilt from
 scratch on first sync.
+
+## Mosques Module (OpenStreetMap)
+
+A second, fully independent mosque/masjid/surau directory sourced from OpenStreetMap, stored in
+Supabase Postgres with PostGIS. This does **not** replace the SISMIM/JAIS-based `masjid`
+feature documented above — it's a parallel system living under `/api/mosques`, its own database,
+its own sync mechanism. Built out in stages; this section grows as each stage lands.
+
+### Why Postgres via `pg`, not the Supabase SDK
+
+Supabase's database is just Postgres — reachable over a normal connection string. The rest of
+this backend talks to its database with raw parameterized SQL (via `better-sqlite3`, no ORM), so
+`pg` (`src/db/postgres.js`) keeps that same style. The `@supabase/supabase-js` SDK is aimed at
+browser/edge use (RLS, realtime, storage, auth) — none of which this feature needs.
+
+### Setup
+
+1. Create a Supabase project (or use an existing one).
+2. Copy its Postgres connection string (**Settings → Database → Connection string → URI**) into
+   `backend/.env` as `DATABASE_URL` (see `.env.example`).
+3. Run the migration once:
+   ```bash
+   npm run migrate-mosques
+   ```
+   This enables the `postgis` and `pg_trgm` extensions and creates the `mosques` table (see
+   `src/db/migrations/001_init_mosques.sql`). Safe to re-run — every statement is
+   `CREATE ... IF NOT EXISTS` / `OR REPLACE`.
+
+### Schema
+
+`mosques` — one row per OpenStreetMap place of worship:
+
+| Column | Notes |
+| --- | --- |
+| `source`, `source_id` | Together unique — the dedup/upsert key for **any** source. For OSM rows, `source_id` is `${osm_type}:${osm_id}` (OSM ids repeat across node/way/relation, so identity there is the pair, not `osm_id` alone). For the geocoded SISMIM/JAIS source (see below), there's no natural id, so `source_id` is a hash of name+address+state+district instead |
+| `osm_id`, `osm_type` | Nullable — only populated for OSM-sourced rows (used for the "Open in OpenStreetMap" link) |
+| `name`, `type` (`Mosque`/`Masjid`/`Surau`) | |
+| `latitude`, `longitude` | Source of truth; the API reads these directly |
+| `location` | `geography(Point, 4326)`, auto-populated from lat/lng by a trigger — used only for spatial queries (nearby search, distance sort), never written to directly |
+| `address`, `city`, `district`, `state`, `postcode`, `country` | |
+| `phone`, `website`, `operator` | |
+| `source` | `"osm"` or `"sismim"`/`"jais"` depending which import populated the row (see `src/db/migrations/002_generalize_source_id.sql`) |
+
+`mosque_sync_meta` — key/value bookkeeping for the import script (last run time, row counts),
+mirroring what `dataset_meta` does for the sqlite masjid sync.
+
+### Import
+
+```bash
+npm run import-mosques
+```
+
+Queries the [Overpass API](https://overpass-api.de) — a live query service over OpenStreetMap
+data — for every element in Malaysia tagged `amenity=place_of_worship`+`religion=muslim` or
+`building=mosque` (`src/services/mosqueSyncService.js`), then upserts them into `mosques`, keyed
+on `(osm_type, osm_id)`: new elements are inserted, previously-imported ones are refreshed with
+the latest tags. Nothing is ever deleted — a mosque that disappears from OSM is left in the table
+rather than silently dropped.
+
+This hits a live third-party API rather than a downloaded extract, so run it manually or on a
+schedule you control (e.g. weekly cron) — there's no automatic scheduling wired up yet, unlike
+the masjid sync's cron job. Be considerate of Overpass's public rate limits; `OVERPASS_API_URL`
+can point at a different mirror if needed (see `.env.example`).
+
+OSM has no tag distinguishing "masjid" from "surau" the way JAKIM's dataset does, so `type` is
+inferred from the name (containing "surau" / "masjid" / neither → generic "Mosque") — a
+best-effort heuristic, not authoritative.
+
+**`state` backfill:** OSM's `addr:state` tag is populated on well under 1% of Malaysian mosques
+in practice. Where it's missing, `state` is instead derived by matching the mosque's coordinates
+to the nearest JAKIM prayer-time zone (reusing `findNearestZone` from the existing zones feature)
+and reading that zone's known state — see `deriveState()` in `mosqueSyncService.js`. This gets
+`state` to ~100% coverage; `district` has no equivalent backfill and stays OSM-only (sparse).
+
+### Alternate source: geocoded SISMIM/JAIS data
+
+```bash
+npm run geocode-mosques          # full run — all rows, ~8h+ against Nominatim's rate limit
+npm run geocode-mosques -- --limit=50   # test run — first 50 rows only, doesn't touch OSM data
+```
+
+The **currently active** data source for `mosques` (as of the last run of this script) — this
+takes the sqlite `masjid` table's own SISMIM/JAIS data (`src/db/database.js`, read-only here,
+completely separate from the unrelated `/api/masjid` feature that owns it) and geocodes each row
+individually via [Nominatim](https://nominatim.openstreetmap.org) (OSM's own free geocoder),
+since that dataset has far better name/address/state/district coverage than OSM's own tags
+(26,396 rows vs OSM's ~7,400) but carries almost no coordinates on its own.
+
+**Real-world result of the last full run:** 26,396 rows in, **7,160 geocoded** successfully
+(27.1%) — lower than a small pre-run sample suggested, since a large share of entries are
+informally-addressed rural surau ("Kg X, Mukim Y" style, or literally a PO box) that Nominatim
+can't resolve. Rows that fail to geocode are **excluded from `mosques` entirely** (no
+coordinates, so they can't appear on the map or in nearby search) — the geocoded SISMIM/JAIS set
+ends up close in size to the OSM set it replaced (7,160 vs 7,409), not a large net gain, but
+`district` coverage jumps from ~0.6% (OSM) to ~99% and most rows carry a genuine JAKIM-sourced
+phone number, which OSM's tags almost never have.
+
+Implementation notes (`src/services/mosqueGeocodeService.js`):
+- **One Nominatim request per row**, deliberately *not* including the mosque/surau's own name in
+  the query — testing against real rows showed including the name made Nominatim fail far more
+  often than it helped (it can't find a POI called "SURAU AL-BAKI" and won't fall back to just
+  the street), while address+district+state alone succeeded in every case that succeeded at all.
+- Strips JAKIM zone-labels masquerading as districts (`"Zon 3"`) and parenthetical asides in
+  state names (`"Kuala Lumpur (FT)"`) before building the query — both measurably hurt matches.
+- Writes upsert incrementally (one row at a time), not in one final transaction — safe to
+  interrupt an 8-hour run; re-running skips every row already geocoded (matched by a hash of
+  name/address/state/district) without spending a Nominatim request on it, so it resumes near
+  where it left off.
+- Only deletes the old OSM-sourced rows (`clearOsmMosques()`) *after* a full successful pass —
+  an interrupted run never leaves the table empty.
+- Respects Nominatim's usage policy: paced to under 1 request/second, and sends a real
+  identifying `User-Agent` (`NOMINATIM_USER_AGENT` in `.env.example` if you want to customize it).
+
+To switch back to OSM as the source, just run `npm run import-mosques` again — it repopulates
+`osm`-sourced rows without touching whatever's currently there from the other source; the two
+just coexist in the same table (distinguished by `source`) until you explicitly clear one out.
+
+### API
+
+All endpoints are read-only (`GET`) and live under `/api/mosques`, registered in `src/app.js`
+alongside (not replacing) `/api/masjid`.
+
+| Route | Query params | Notes |
+| --- | --- | --- |
+| `GET /api/mosques` | `page`, `limit` (max 10000), `search`, `state`, `district`, `city`, `type` (`Mosque`\|`Masjid`\|`Surau`), `lat`+`lng`+`radius` (km, default 5, max 50), `sort` (`name` \| `distance` \| `newest`) | `sort=distance` only applies when `lat`/`lng` are given; results include a `distance_km` field in that case |
+| `GET /api/mosques/:id` | — | `id` is the internal serial id, not `osm_id` |
+| `GET /api/mosques/states` | — | `{ state, count }[]`, cached in-memory for 10 minutes |
+| `GET /api/mosques/districts` | `state` (required) | `{ district, count }[]`, cached in-memory for 10 minutes |
+| `GET /api/mosques/search` | `q` (required), plus the same `page`/`limit` as above | Thin alias over `GET /api/mosques?search=` — same response shape |
+
+Pagination response shape matches the existing masjid feature exactly:
+```json
+{ "data": [...], "pagination": { "page": 1, "limit": 50, "total": 7409, "totalPages": 149 } }
+```
+
+Example — mosques within 3km of KLCC, nearest first:
+```bash
+curl "http://localhost:3000/api/mosques?lat=3.1579&lng=101.7116&radius=3&sort=distance&limit=5"
+```
+
+### Contributions ("this mosque isn't listed yet")
+
+Two `POST` endpoints — the only write/JSON-body routes in this backend, which is why
+`express.json({ limit: "10kb" })` is now in `src/app.js`.
+
+| Route | Body | Notes |
+| --- | --- | --- |
+| `POST /api/mosques/resolve-location` | `{ "url": "<google maps link>" }` | Returns `{ latitude, longitude }` or `422 UnresolvableUrl`. Only accepts `google.com`/`goo.gl` hostnames (rejects anything else outright, so this can't be used as an open URL-fetching proxy) |
+| `POST /api/mosques/submissions` | `{ name, type?, address?, latitude, longitude, mapsUrl?, phone?, website?, notes? }` | `name` and a location (`latitude`+`longitude`) are required; everything else is optional. Returns `{ id, status: "pending" }` |
+
+Submissions land in **`mosque_submissions`** (`src/db/migrations/003_create_mosque_submissions.sql`)
+— a moderation queue, not a direct write into `mosques`. Nothing submitted through the form
+appears on the public map automatically; there's no review UI yet, so approving a submission
+today means querying `mosque_submissions WHERE status = 'pending'` directly and copying the row
+into `mosques` by hand (and setting `status = 'approved'` on the submission) if it looks good.
+
+**Google Maps link resolution** (`resolveGoogleMapsUrl()` in `src/routes/mosques.js`): "long" URLs
+already have coordinates embedded in the path/query and are parsed directly, no request needed.
+Shortened links (`maps.app.goo.gl/...`, the common case sharing from a phone) have no coordinates
+in the URL itself, so they're fetched **server-side** to follow the redirect — a browser can't do
+this itself, since reading the final URL of a cross-origin redirect is blocked by CORS. Verified
+against a real long-form `/maps/place/.../@lat,lng,zoom/data=...!3d{lat}!4d{lng}` URL (the format
+Google's short links redirect to); **not** verified against an actual live short link end-to-end,
+since generating one requires using the Maps app's own share feature — worth a real test once
+this is live.

@@ -136,4 +136,13 @@ const zones = [
 
 export const zoneCodes = new Set(zones.flatMap((state) => state.zones.map((z) => z.code)));
 
+const zoneCodeToState = new Map(
+  zones.flatMap((entry) => entry.zones.map((z) => [z.code, entry.state]))
+);
+
+/** Looks up which state a JAKIM zone code belongs to (e.g. "SGR01" -> "Selangor"). */
+export function getStateForZoneCode(code) {
+  return zoneCodeToState.get(code) ?? null;
+}
+
 export default zones;
