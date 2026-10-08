@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Unset in a production build means the API is served from the same origin.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 /** Backs the "contribute a mosque/surau" form: resolving a pasted Google
  * Maps link to coordinates, and submitting the finished form. Both hit

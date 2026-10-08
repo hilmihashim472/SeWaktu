@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Unset in a production build means the API is served from the same origin.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 /** Looks up the human-readable districts label for a JAKIM zone code, so the
  * zone name is always correct regardless of how `zone` was set (stored from

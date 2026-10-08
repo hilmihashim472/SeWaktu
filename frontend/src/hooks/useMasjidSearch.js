@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import useDebounce from "./useDebounce";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Unset in a production build means the API is served from the same origin.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 /** Fetches /api/masjid for the given filters, debouncing the search text
  * and cancelling in-flight requests when filters change again before the

@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -34,6 +36,16 @@ app.use("/api/masjid", masjidRouter);
 app.use("/api/mosques", mosquesRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/timetable", timetableRouter);
+
+// In the single-image Docker deploy, the built frontend is served from here too.
+const frontendDist = process.env.FRONTEND_DIST;
+if (frontendDist && fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist, { index: false }));
+  // SPA fallback so client-side routes (react-router) work on refresh.
+  app.get(/^\/(?!api\/).*/, (req, res) => {
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+}
 
 app.use((req, res) => {
   res.status(404).json({ error: "NotFound", message: `No route for ${req.method} ${req.originalUrl}` });

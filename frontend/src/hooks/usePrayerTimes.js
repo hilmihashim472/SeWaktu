@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// Unset in a production build means the API is served from the same origin.
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 export default function usePrayerTimes(zone) {
   const [data, setData] = useState(null);
