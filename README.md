@@ -119,6 +119,11 @@ one immediately instead of waiting for the daily 3am job.
 | `REQUEST_TIMEOUT_MS` | Timeout for outbound JAKIM/Aladhan requests | `8000` |
 | `ADMIN_SYNC_TOKEN` | Shared secret for the manual masjid-sync endpoint | — |
 | `DATABASE_PATH` | Optional: absolute path for the masjid SQLite file | `backend/src/db/masjid.sqlite3` |
+| `DATABASE_URL` | Supabase Postgres connection string (mosques module) | — |
+| `SITE_URL` | Public URL, used for canonical/share links, `robots.txt` and `sitemap.xml` | request host |
+| `TRUST_PROXY` | Number of reverse proxies in front of the app (Coolify = 1, + Cloudflare = 2) | `1` |
+| `RATE_LIMIT_PER_MINUTE` | Per-IP limit for `/api` requests | `300` |
+| `FRONTEND_DIST` | Directory of the built frontend to serve (set by the Dockerfile) | — |
 
 **`frontend/.env`**
 
@@ -132,6 +137,20 @@ The frontend is a static SPA build (deploys anywhere that serves static files). 
 a stateful Express process with a local SQLite file and an in-process `node-cron` scheduler —
 that combination doesn't run on serverless/edge platforms like Vercel, so the two halves need
 different kinds of hosts.
+
+### Single Docker image → Coolify (recommended)
+
+The root `Dockerfile` builds the frontend and serves it from the Express backend, so the whole
+app is one container on one domain (no `VITE_API_URL` or CORS setup needed).
+
+1. In Coolify: **New Resource → Public Repository** (or GitHub App), branch `main`.
+2. Build Pack **Dockerfile**, Base Directory `/`, port `3000`, and set your domain.
+3. Environment variables: `SITE_URL` (e.g. `https://sewaktu.example.com`), `DATABASE_URL`,
+   `ADMIN_SYNC_TOKEN`.
+4. **Persistent Storage → Add Volume** mounted at `/data` so the masjid SQLite file survives
+   redeploys.
+5. Deploy. The container healthcheck uses `GET /api/health`; `GET /api/health/ready` also
+   checks Postgres and is the one to point an uptime monitor at.
 
 ### Frontend → Vercel
 

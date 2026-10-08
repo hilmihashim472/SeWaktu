@@ -1,5 +1,6 @@
 import { useTheme } from "../contexts/ThemeContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const THEME_OPTIONS = [
   {
@@ -51,6 +52,7 @@ function SettingsSection({ title, description, children }) {
 export default function Settings({ notifications }) {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  usePageMeta({ title: t("seo.settingsTitle") });
 
   const handleToggleNotifications = () => {
     if (notifications.enabled) {

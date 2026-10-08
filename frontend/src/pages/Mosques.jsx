@@ -8,6 +8,7 @@ import MosqueCard from "../components/mosques/MosqueCard";
 import Pagination from "../components/mosques/Pagination";
 import useMosqueSearch from "../hooks/useMosqueSearch";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const PAGE_SIZE = 50;
 
@@ -93,6 +94,7 @@ function ListSkeleton() {
 
 export default function Mosques() {
   const { t } = useLanguage();
+  usePageMeta({ title: t("seo.mosquesTitle"), description: t("seo.mosquesDescription") });
   const navigate = useNavigate();
 
   const [filters, setFilters] = useState({ search: "", state: "", district: "", type: "" });

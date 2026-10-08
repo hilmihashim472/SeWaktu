@@ -1,25 +1,63 @@
 <!doctype html>
-<html lang="en">
+<html lang="ms">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/iconSW.svg" />
-    <link rel="apple-touch-icon" href="/iconSW.svg" />
-    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SeWaktu - Waktu Solat Malaysia</title>
+    <meta
+      name="description"
+      content="Waktu solat tepat untuk semua zon JAKIM di Malaysia, takwim bulanan, kompas kiblat dan direktori masjid. Prayer times, monthly timetable, Qiblat compass and masjid directory."
+    />
+    <!-- __SITE_URL__ / __CANONICAL_URL__ are filled in by the backend when it serves this page. -->
+    <link rel="canonical" href="__CANONICAL_URL__" />
+
+    <link rel="icon" type="image/svg+xml" href="/iconSW.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#FBF7EF" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0B1F2A" media="(prefers-color-scheme: dark)" />
-    <title>SeWaktu - Waktu Solat Malaysia</title>
-    <script>
-      (function () {
-        var theme = localStorage.getItem("sewaktu.theme");
-        var isDark =
-          theme === "dark" ||
-          (theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-        document.documentElement.classList.toggle("dark", isDark);
-      })();
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SeWaktu" />
+    <meta property="og:locale" content="ms_MY" />
+    <meta property="og:locale:alternate" content="en_MY" />
+    <meta property="og:title" content="SeWaktu - Waktu Solat Malaysia" />
+    <meta
+      property="og:description"
+      content="Waktu solat, takwim bulanan, kompas kiblat dan direktori masjid untuk seluruh Malaysia."
+    />
+    <meta property="og:url" content="__CANONICAL_URL__" />
+    <meta property="og:image" content="__SITE_URL__/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="SeWaktu - Waktu Solat Malaysia" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SeWaktu - Waktu Solat Malaysia" />
+    <meta
+      name="twitter:description"
+      content="Waktu solat, takwim bulanan, kompas kiblat dan direktori masjid untuk seluruh Malaysia."
+    />
+    <meta name="twitter:image" content="__SITE_URL__/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "SeWaktu",
+        "alternateName": "SeWaktu - Waktu Solat Malaysia",
+        "url": "__SITE_URL__/",
+        "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Any",
+        "inLanguage": ["ms", "en"],
+        "description": "Malaysian prayer times for every JAKIM zone, monthly timetable, Qiblat compass and masjid directory.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MYR" }
+      }
     </script>
+
+    <script src="/theme-init.js"></script>
   </head>
   <body>
+    <noscript>SeWaktu memerlukan JavaScript. Sila aktifkan JavaScript untuk melihat waktu solat.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

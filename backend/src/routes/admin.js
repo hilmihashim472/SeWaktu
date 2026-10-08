@@ -1,7 +1,15 @@
+import crypto from "node:crypto";
 import { Router } from "express";
 import { syncDataset } from "../services/masjidSyncService.js";
 
 const router = Router();
+
+// Constant-time comparison so the token can't be guessed byte-by-byte from response timing.
+function tokensMatch(provided, expected) {
+  const a = crypto.createHash("sha256").update(provided).digest();
+  const b = crypto.createHash("sha256").update(expected).digest();
+  return crypto.timingSafeEqual(a, b);
+}
 
 function requireAdminToken(req, res, next) {
   const expected = process.env.ADMIN_SYNC_TOKEN;
@@ -12,7 +20,7 @@ function requireAdminToken(req, res, next) {
   }
 
   const provided = req.header("X-Admin-Token");
-  if (!provided || provided !== expected) {
+  if (!provided || !tokensMatch(provided, expected)) {
     return res.status(401).json({ error: "Unauthorized", message: "Missing or invalid X-Admin-Token header." });
   }
 

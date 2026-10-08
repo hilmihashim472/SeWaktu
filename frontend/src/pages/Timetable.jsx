@@ -7,6 +7,7 @@ import TimetableTable from "../components/timetable/TimetableTable";
 import useTimetable from "../hooks/useTimetable";
 import { PRAYER_LABELS } from "../components/PrayerGrid";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const MAX_MONTHS_AHEAD = 12;
 
@@ -85,6 +86,7 @@ function downloadTimetableCsv(zone, month, year, days) {
 
 export default function Timetable({ zone, setZone, zoneName }) {
   const { t } = useLanguage();
+  usePageMeta({ title: t("seo.timetableTitle"), description: t("seo.timetableDescription") });
   const [searchParams, setSearchParams] = useSearchParams();
   const { year: currentYear, month: currentMonth } = getCurrentKLYearMonth();
 

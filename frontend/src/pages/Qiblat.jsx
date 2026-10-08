@@ -8,6 +8,7 @@ import {
   requestOrientationPermission,
 } from "../lib/qiblat";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 function LocatingState() {
   return (
@@ -159,6 +160,7 @@ function CalibrationModal({ onClose }) {
 
 export default function Qiblat() {
   const { t } = useLanguage();
+  usePageMeta({ title: t("seo.qiblatTitle"), description: t("seo.qiblatDescription") });
   const [coords, setCoords] = useState(null);
   const [geoStatus, setGeoStatus] = useState("loading");
   const [geoErrorCode, setGeoErrorCode] = useState("");

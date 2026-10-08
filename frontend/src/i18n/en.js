@@ -225,6 +225,24 @@ export default {
   notifications: {
     body: "It's time for {{prayer}} prayer",
   },
+  seo: {
+    homeDescription:
+      "Today's prayer times for every JAKIM zone in Malaysia — Subuh, Zohor, Asar, Maghrib and Isyak, with a countdown to the next prayer.",
+    timetableTitle: "Monthly Prayer Timetable",
+    timetableDescription: "A full month of prayer times for your zone, exportable to CSV.",
+    qiblatTitle: "Qiblat Direction",
+    qiblatDescription: "Online Qiblat compass to find the direction of the Kaaba from anywhere in Malaysia.",
+    mosquesTitle: "Masjid & Surau Directory",
+    mosquesDescription: "Find mosques and suraus across Malaysia by state, district, or nearby location.",
+    mosqueDescription: "Address, location and details for {{name}}.",
+    settingsTitle: "Settings",
+    notFoundTitle: "Page not found",
+  },
+  notFound: {
+    title: "Page not found",
+    body: "The page you're looking for doesn't exist or has moved.",
+    home: "Back to prayer times",
+  },
   errors: {
     geoDenied: "Location access was denied.",
     geoUnavailable: "Your location couldn't be determined.",

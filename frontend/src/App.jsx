@@ -9,6 +9,7 @@ import MosqueDetail from "./pages/MosqueDetail";
 import Timetable from "./pages/Timetable";
 import Qiblat from "./pages/Qiblat";
 import Settings from "./pages/Settings";
+import NotFound from "./pages/NotFound";
 import usePrayerTimes from "./hooks/usePrayerTimes";
 import useCountdown from "./hooks/useCountdown";
 import useClock from "./hooks/useClock";
@@ -127,6 +128,7 @@ export default function App() {
         />
         <Route path="/qiblat" element={<Qiblat />} />
         <Route path="/settings" element={<Settings notifications={notifications} />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       <div className="pb-24 sm:pb-0">

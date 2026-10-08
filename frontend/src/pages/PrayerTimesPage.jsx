@@ -4,6 +4,7 @@ import ZoneSelectorModal from "../components/ZoneSelectorModal";
 import PrayerHero from "../components/PrayerHero";
 import PrayerGrid from "../components/PrayerGrid";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 function PrayerSkeleton() {
   return (
@@ -69,6 +70,7 @@ export default function PrayerTimesPage({
   progress,
 }) {
   const { t } = useLanguage();
+  usePageMeta({ description: t("seo.homeDescription") });
   const [isZoneModalOpen, setZoneModalOpen] = useState(false);
 
   return (

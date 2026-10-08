@@ -226,6 +226,24 @@ export default {
   notifications: {
     body: "Sudah masuk waktu solat {{prayer}}",
   },
+  seo: {
+    homeDescription:
+      "Waktu solat hari ini untuk semua zon JAKIM di Malaysia — Subuh, Zohor, Asar, Maghrib dan Isyak, dengan kiraan detik ke waktu seterusnya.",
+    timetableTitle: "Takwim Waktu Solat Bulanan",
+    timetableDescription: "Jadual waktu solat sebulan penuh untuk zon anda, boleh dieksport ke CSV.",
+    qiblatTitle: "Arah Kiblat",
+    qiblatDescription: "Kompas kiblat dalam talian untuk mencari arah Kaabah dari lokasi anda di Malaysia.",
+    mosquesTitle: "Direktori Masjid & Surau",
+    mosquesDescription: "Cari masjid dan surau di seluruh Malaysia mengikut negeri, daerah atau lokasi berdekatan.",
+    mosqueDescription: "Alamat, lokasi dan maklumat {{name}}.",
+    settingsTitle: "Tetapan",
+    notFoundTitle: "Halaman tidak dijumpai",
+  },
+  notFound: {
+    title: "Halaman tidak dijumpai",
+    body: "Halaman yang anda cari tidak wujud atau telah dialihkan.",
+    home: "Kembali ke waktu solat",
+  },
   errors: {
     geoDenied: "Akses lokasi ditolak.",
     geoUnavailable: "Lokasi anda tidak dapat dikesan.",

@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import useMosqueDetail from "../hooks/useMosqueDetail";
 import MosqueMap from "../components/mosques/MosqueMap";
 import { useLanguage } from "../contexts/LanguageContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 function DetailRow({ label, value, href }) {
   if (!value) return null;
@@ -53,6 +54,10 @@ export default function MosqueDetail() {
   const { id } = useParams();
   const { mosque, loading, error } = useMosqueDetail(id);
   const { t } = useLanguage();
+  usePageMeta({
+    title: mosque?.name || t("seo.mosquesTitle"),
+    description: mosque ? t("seo.mosqueDescription", { name: mosque.name }) : t("seo.mosquesDescription"),
+  });
 
   const googleMapsUrl = mosque
     ? `https://www.google.com/maps/search/?api=1&query=${mosque.latitude},${mosque.longitude}`
